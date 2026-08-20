@@ -5,6 +5,7 @@ import { trip } from "@/data/trip";
 import { itinerary } from "@/data/itinerary";
 import { activities } from "@/data/activities";
 import { packingList } from "@/data/packing";
+import { budgetCategories } from "@/data/budget";
 
 const sections = [
   { href: "/itinerario", label: "Itinerário", desc: "Roteiro dia a dia" },
@@ -14,6 +15,7 @@ const sections = [
     desc: "O que fazer e onde comer",
   },
   { href: "/transporte", label: "Transporte", desc: "Voos, ônibus, carro" },
+  { href: "/orcamento", label: "Orçamento", desc: "Metas e despesas da viagem" },
   { href: "/clima", label: "Clima", desc: "Referência sazonal" },
   { href: "/mala", label: "Checklist de Mala", desc: "O que levar" },
   { href: "/documentos", label: "Documentos", desc: "Passaporte, seguro, vouchers" },
@@ -54,9 +56,11 @@ export default function Home() {
         </Card>
         <Card className="text-center">
           <p className="text-2xl font-semibold">
-            {trip.entryCity ?? "?"}
+            {budgetCategories
+              .reduce((sum, c) => sum + c.plannedBRL, 0)
+              .toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
           </p>
-          <p className="text-xs text-black/60 dark:text-white/60">entrada</p>
+          <p className="text-xs text-black/60 dark:text-white/60">orçamento planejado</p>
         </Card>
       </section>
 

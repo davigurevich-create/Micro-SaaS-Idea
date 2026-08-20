@@ -8,6 +8,7 @@ const links = [
   { href: "/itinerario", label: "Itinerário" },
   { href: "/passeios", label: "Passeios & Restaurantes" },
   { href: "/transporte", label: "Transporte" },
+  { href: "/orcamento", label: "Orçamento" },
   { href: "/clima", label: "Clima" },
   { href: "/mala", label: "Checklist de Mala" },
   { href: "/documentos", label: "Documentos" },

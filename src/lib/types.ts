@@ -72,3 +72,26 @@ export interface TripDocument {
   owner: Owner;
   notes?: string;
 }
+
+export type Currency = "BRL" | "ARS" | "CLP" | "USD";
+
+export interface BudgetCategory {
+  id: string;
+  name: string;
+  plannedBRL: number;
+}
+
+export type ExpenseStatus = "planejado" | "pago";
+
+export interface Expense {
+  id: string;
+  categoryId: string;
+  description: string;
+  amount: number; // valor na moeda original (o que de fato foi/será pago)
+  currency: Currency;
+  amountBRL: number; // equivalente em reais, informado manualmente
+  date: string | null;
+  paidBy: Owner;
+  status: ExpenseStatus;
+  notes?: string;
+}
