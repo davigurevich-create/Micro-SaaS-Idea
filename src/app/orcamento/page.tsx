@@ -1,11 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { Card } from "@/components/Card";
 import {
   budgetCategories as seedCategories,
   expenses as seedExpenses,
 } from "@/data/budget";
+import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { STORAGE_KEYS } from "@/lib/storageKeys";
 import {
   BudgetCategory,
   Currency,
@@ -13,8 +15,6 @@ import {
   ExpenseStatus,
   Owner,
 } from "@/lib/types";
-
-const STORAGE_KEY = "patagonia-2027-orcamento";
 
 const currencies: Currency[] = ["BRL", "ARS", "CLP", "USD"];
 const currencySymbols: Record<Currency, string> = {
@@ -30,9 +30,14 @@ function formatBRL(value: number) {
 }
 
 export default function OrcamentoPage() {
-  const [categories, setCategories] = useState<BudgetCategory[]>(seedCategories);
-  const [items, setItems] = useState<Expense[]>(seedExpenses);
-  const [loaded, setLoaded] = useState(false);
+  const [categories, setCategories] = useLocalStorageState<BudgetCategory[]>(
+    `${STORAGE_KEYS.budget}.categories`,
+    seedCategories
+  );
+  const [items, setItems] = useLocalStorageState<Expense[]>(
+    `${STORAGE_KEYS.budget}.items`,
+    seedExpenses
+  );
 
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState(seedCategories[0]?.id ?? "");
@@ -42,35 +47,6 @@ export default function OrcamentoPage() {
   const [date, setDate] = useState("");
   const [paidBy, setPaidBy] = useState<Owner>("Ambos");
   const [status, setStatus] = useState<ExpenseStatus>("planejado");
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as {
-          categories: BudgetCategory[];
-          items: Expense[];
-        };
-        // Sincroniza com o localStorage (fonte externa) só no cliente, na montagem.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCategories(parsed.categories ?? seedCategories);
-        setItems(parsed.items ?? seedExpenses);
-      }
-    } catch {
-      // ignora falha de leitura
-    } finally {
-      setLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!loaded) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ categories, items }));
-    } catch {
-      // ignora falha ao salvar
-    }
-  }, [categories, items, loaded]);
 
   function addExpense(e: FormEvent) {
     e.preventDefault();

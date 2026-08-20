@@ -3,12 +3,14 @@ export interface TripInfo {
   travelers: string[];
   startDate: string | null; // ISO date (YYYY-MM-DD), null enquanto não definido
   endDate: string | null;
+  durationDays: number | null; // referência de duração enquanto as datas exatas não fecham
   entryCity: string | null;
+  exitCity: string | null;
   notes?: string;
 }
 
 export interface ItineraryDay {
-  dayNumber: number;
+  id: string;
   date: string | null;
   location: string;
   accommodation?: string;
