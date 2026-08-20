@@ -100,9 +100,6 @@ export default function Home() {
       <Hero />
 
       <section>
-        <p className="text-sm text-black/60 dark:text-white/60 mb-1">
-          {trip.travelers.join(" & ")}
-        </p>
         <h1 className="text-3xl font-bold mb-2">{trip.title}</h1>
         <Countdown startDate={trip.startDate} />
 
