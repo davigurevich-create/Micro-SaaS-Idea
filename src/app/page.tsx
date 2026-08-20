@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/Card";
 import { Countdown } from "@/components/Countdown";
+import { Hero } from "@/components/Hero";
 import { trip as seedTrip } from "@/data/trip";
 import { itinerary as seedItinerary } from "@/data/itinerary";
 import { activities as seedActivities } from "@/data/activities";
@@ -96,6 +97,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-8">
+      <Hero />
+
       <section>
         <p className="text-sm text-black/60 dark:text-white/60 mb-1">
           {trip.travelers.join(" & ")}

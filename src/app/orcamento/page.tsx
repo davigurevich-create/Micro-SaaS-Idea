@@ -23,7 +23,7 @@ const currencySymbols: Record<Currency, string> = {
   CLP: "CL$",
   USD: "US$",
 };
-const owners: Owner[] = ["Rubens", "Vitória", "Ambos"];
+const owners: Owner[] = ["Davi", "Nitzi", "Ambos"];
 
 function formatBRL(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

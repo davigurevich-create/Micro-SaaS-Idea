@@ -15,7 +15,7 @@ const typeLabels: Record<DocumentType, string> = {
   outro: "Outro",
 };
 const types: DocumentType[] = ["passaporte", "seguro", "voucher", "reserva", "outro"];
-const owners: Owner[] = ["Rubens", "Vitória", "Ambos"];
+const owners: Owner[] = ["Davi", "Nitzi", "Ambos"];
 
 const emptyForm = {
   title: "",

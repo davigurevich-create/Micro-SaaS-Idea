@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Patagônia 2027",
-  description: "Planejamento da viagem à Patagônia — Rubens & Vitória",
+  description: "Planejamento da viagem à Patagônia — Davi & Nitzi",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

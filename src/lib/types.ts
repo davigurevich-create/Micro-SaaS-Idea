@@ -55,7 +55,7 @@ export interface ClimateInfo {
   notes: string;
 }
 
-export type Owner = "Rubens" | "Vitória" | "Ambos";
+export type Owner = "Davi" | "Nitzi" | "Ambos";
 
 export interface PackingItem {
   id: string;

@@ -4,7 +4,7 @@ import { TripInfo } from "@/lib/types";
 // Este é só o valor inicial antes de qualquer edição.
 export const trip: TripInfo = {
   title: "Patagônia 2027",
-  travelers: ["Rubens", "Vitória"],
+  travelers: ["Davi", "Nitzi"],
   startDate: null,
   endDate: null,
   durationDays: 12,

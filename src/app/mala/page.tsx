@@ -7,7 +7,7 @@ import { useLocalStorageState } from "@/lib/useLocalStorageState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { Owner, PackingItem } from "@/lib/types";
 
-const owners: Owner[] = ["Rubens", "Vitória", "Ambos"];
+const owners: Owner[] = ["Davi", "Nitzi", "Ambos"];
 
 export default function MalaPage() {
   const [items, setItems] = useLocalStorageState<PackingItem[]>(
