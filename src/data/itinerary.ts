@@ -46,7 +46,7 @@ export const itinerary: ItineraryDay[] = [
     location: "El Calafate",
     accommodation: "Airbnb em El Calafate (a definir)",
     summary:
-      "Puerto Natales → El Calafate (~4-5h, cruzando a fronteira Chile/Argentina — reservar tempo extra pra imigração). Chegada à tarde, resto do dia livre.",
+      "Devolução do carro em Puerto Natales pela manhã, ônibus até El Calafate (~4-5h, cruzando a fronteira — reservar tempo extra pra imigração) e retirada do segundo carro (já na Argentina) ao chegar. Chegada à tarde, resto do dia livre.",
     activityIds: [],
   },
   {
