@@ -5,11 +5,11 @@ import { TripInfo } from "@/lib/types";
 export const trip: TripInfo = {
   title: "Patagônia 2027",
   travelers: ["Davi", "Nitzi"],
-  startDate: null,
-  endDate: null,
-  durationDays: 12,
-  entryCity: null,
-  exitCity: null,
+  startDate: "2027-03-26",
+  endDate: "2027-04-05",
+  durationDays: 11,
+  entryCity: "Punta Arenas (Chile)",
+  exitCity: "El Calafate (Argentina)",
   notes:
-    "Sonho principal: o clássico outono patagônico, com as montanhas iluminadas de laranja ao amanhecer. Mirando a 1ª quinzena de março/2027 (trilhas e refúgios ainda em operação plena).",
+    "Embarque na noite de 25/03, chegada em Punta Arenas na manhã de 26/03 pra já pegar o carro alugado. Volta pro Brasil saindo de El Calafate na segunda-feira, 05/04. Sonho principal: o clássico outono patagônico, com as montanhas iluminadas de laranja ao amanhecer.",
 };
