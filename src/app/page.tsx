@@ -2,9 +2,17 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Card } from "@/components/Card";
 import { Countdown } from "@/components/Countdown";
 import { Hero } from "@/components/Hero";
+
+const RouteMap = dynamic(() => import("@/components/RouteMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-80 sm:h-[420px] w-full rounded-2xl bg-black/5 dark:bg-white/10 animate-pulse" />
+  ),
+});
 import { trip as seedTrip } from "@/data/trip";
 import { itinerary as seedItinerary } from "@/data/itinerary";
 import { activities as seedActivities } from "@/data/activities";
@@ -216,6 +224,17 @@ export default function Home() {
           </p>
           <p className="text-xs text-black/60 dark:text-white/60">orçamento planejado</p>
         </Card>
+      </section>
+
+      <section>
+        <h2 className="font-semibold mb-3">Mapa do Roteiro</h2>
+        <div className="rounded-2xl border border-black/10 dark:border-white/10 overflow-hidden">
+          <RouteMap />
+        </div>
+        <p className="text-xs text-black/50 dark:text-white/50 mt-2">
+          Linha sólida: percurso de carro. Linha laranja pontilhada: day trips
+          a Torres del Paine a partir de Puerto Natales.
+        </p>
       </section>
 
       <section>
