@@ -5,11 +5,11 @@ import { TripInfo } from "@/lib/types";
 export const trip: TripInfo = {
   title: "Patagônia 2027",
   travelers: ["Davi", "Nitzi"],
-  startDate: "2027-03-26",
-  endDate: "2027-04-05",
+  startDate: "2027-03-25",
+  endDate: "2027-04-04",
   durationDays: 11,
-  entryCity: "Punta Arenas (Chile)",
+  entryCity: "El Calafate (Argentina)",
   exitCity: "El Calafate (Argentina)",
   notes:
-    "Embarque na noite de 25/03, chegada em Punta Arenas na manhã de 26/03 pra já pegar o carro alugado. Volta pro Brasil saindo de El Calafate na segunda-feira, 05/04. Sonho principal: o clássico outono patagônico, com as montanhas iluminadas de laranja ao amanhecer.",
+    "Embarque de SP na noite de 24/03 (quarta), chegada em El Calafate às 9h de 25/03 (quinta) pra já pegar o carro alugado. Loop de carro único: El Calafate → El Chaltén → Puerto Natales/Torres del Paine → El Calafate, com permissão de fronteira pro trecho no Chile. Volta pra SP saindo de El Calafate no domingo, 04/04. Sonho principal: o clássico outono patagônico, com as montanhas iluminadas de laranja ao amanhecer.",
 };
