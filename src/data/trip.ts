@@ -11,5 +11,5 @@ export const trip: TripInfo = {
   entryCity: "El Calafate (Argentina)",
   exitCity: "El Calafate (Argentina)",
   notes:
-    "Embarque de SP na noite de 24/03 (quarta), chegada em El Calafate às 9h de 25/03 (quinta) pra já pegar o carro alugado. Loop de carro único: El Calafate → El Chaltén → Puerto Natales/Torres del Paine → El Calafate, com permissão de fronteira pro trecho no Chile. Volta pra SP saindo de El Calafate no domingo, 04/04. Sonho principal: o clássico outono patagônico, com as montanhas iluminadas de laranja ao amanhecer.",
+    "Embarque de SP na noite de 24/03 (quarta), chegada em El Calafate às 7h30 de 25/03 (quinta) pra já pegar o carro alugado. Loop de carro único: El Calafate (2+1 noites) → El Chaltén (3 noites) → Puerto Natales/Torres del Paine (4 noites) → El Calafate, com permissão de fronteira pro trecho no Chile. Volta pra SP saindo de El Calafate às 10h20 do domingo, 04/04. Sonho principal: o clássico outono patagônico, com as montanhas iluminadas de laranja ao amanhecer.",
 };
