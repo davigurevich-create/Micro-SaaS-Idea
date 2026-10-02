@@ -94,9 +94,10 @@ export interface Expense {
   currency: Currency;
   amountBRL: number; // equivalente em reais, informado manualmente
   date: string | null;
-  paidBy: Owner;
+  paidBy: Owner; // quem desembolsou o dinheiro (cartão/conta usada)
   status: ExpenseStatus;
   paymentType: PaymentType;
   installments?: number; // número de parcelas, só relevante se paymentType === "parcelado"
+  splitBetween?: Owner; // de quem é o custo, pra dividir de forma justa (fallback "Ambos" se ausente)
   notes?: string;
 }

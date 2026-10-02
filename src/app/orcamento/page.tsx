@@ -37,6 +37,12 @@ function paymentLabel(exp: Expense) {
   return "à vista";
 }
 
+// Despesas salvas antes desse campo existir não têm splitBetween — assume
+// "Ambos" nesse caso (maioria dos custos de viagem de casal é compartilhada).
+function effectiveSplit(exp: Expense): Owner {
+  return exp.splitBetween ?? "Ambos";
+}
+
 export default function OrcamentoPage() {
   const [categories, setCategories] = useLocalStorageState<BudgetCategory[]>(
     `${STORAGE_KEYS.budget}.categories`,
@@ -54,6 +60,7 @@ export default function OrcamentoPage() {
   const [amountBRL, setAmountBRL] = useState("");
   const [date, setDate] = useState("");
   const [paidBy, setPaidBy] = useState<Owner>("Ambos");
+  const [splitBetween, setSplitBetween] = useState<Owner>("Ambos");
   const [status, setStatus] = useState<ExpenseStatus>("planejado");
   const [paymentType, setPaymentType] = useState<PaymentType>("avista");
   const [installments, setInstallments] = useState("2");
@@ -67,6 +74,7 @@ export default function OrcamentoPage() {
     setAmountBRL("");
     setDate("");
     setPaidBy("Ambos");
+    setSplitBetween("Ambos");
     setStatus("planejado");
     setPaymentType("avista");
     setInstallments("2");
@@ -82,6 +90,7 @@ export default function OrcamentoPage() {
     setAmountBRL(exp.amountBRL.toString());
     setDate(exp.date ?? "");
     setPaidBy(exp.paidBy);
+    setSplitBetween(effectiveSplit(exp));
     setStatus(exp.status);
     setPaymentType(exp.paymentType);
     setInstallments(exp.installments ? exp.installments.toString() : "2");
@@ -103,6 +112,7 @@ export default function OrcamentoPage() {
       amountBRL: amountBRLNum,
       date: date || null,
       paidBy,
+      splitBetween,
       status,
       paymentType,
       installments:
@@ -143,22 +153,45 @@ export default function OrcamentoPage() {
   const totalGasto = totalPago + totalReservado;
 
   const people = owners.filter((o): o is Exclude<Owner, "Ambos"> => o !== "Ambos");
-  const sharedTotal = items
-    .filter((i) => i.paidBy === "Ambos")
+
+  // Gasto por Pessoa: cota justa de cada um, baseada em "Despesa de"
+  // (splitBetween) — não em quem pagou. Um gasto "Ambos" é dividido ao meio.
+  const sharedSplitTotal = items
+    .filter((i) => effectiveSplit(i) === "Ambos")
     .reduce((sum, i) => sum + i.amountBRL, 0);
-  const perPerson = people.map((person) => {
+  const perPersonShare = people.map((person) => {
     const direct = items
-      .filter((i) => i.paidBy === person)
+      .filter((i) => effectiveSplit(i) === person)
       .reduce((sum, i) => sum + i.amountBRL, 0);
-    const share = sharedTotal / 2;
+    const share = sharedSplitTotal / 2;
     return { person, direct, share, total: direct + share };
   });
-  const davi = perPerson[0];
-  const nitzi = perPerson[1];
+  const davi = perPersonShare[0];
+  const nitzi = perPersonShare[1];
   const splitPct =
     davi && nitzi && davi.total + nitzi.total > 0
       ? (davi.total / (davi.total + nitzi.total)) * 100
       : 50;
+
+  // Acerto de Contas: quanto cada um desembolsou de fato (paidBy) vs. sua
+  // cota justa (perPersonShare) — a diferença é quem deve pra quem.
+  const sharedPaidTotal = items
+    .filter((i) => i.paidBy === "Ambos")
+    .reduce((sum, i) => sum + i.amountBRL, 0);
+  const settleUp = people.map((person) => {
+    const paidDirect = items
+      .filter((i) => i.paidBy === person)
+      .reduce((sum, i) => sum + i.amountBRL, 0);
+    const paidTotal = paidDirect + sharedPaidTotal / 2;
+    const fairShare = perPersonShare.find((p) => p.person === person)?.total ?? 0;
+    return { person, paidTotal, fairShare, balance: paidTotal - fairShare };
+  });
+  const [daviSettle, nitziSettle] = settleUp;
+  const settleAmount = daviSettle ? Math.abs(daviSettle.balance) : 0;
+  const settleCreditor =
+    daviSettle && daviSettle.balance > 0 ? daviSettle.person : nitziSettle?.person;
+  const settleDebtor =
+    daviSettle && daviSettle.balance > 0 ? nitziSettle?.person : daviSettle?.person;
 
   return (
     <div className="flex flex-col gap-6">
@@ -172,33 +205,40 @@ export default function OrcamentoPage() {
         </p>
       </div>
 
-      <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="text-center">
-          <p className="text-lg font-semibold">{formatBRL(totalPlanned)}</p>
-          <p className="text-xs text-black/60 dark:text-white/60">planejado</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-lg font-semibold">{formatBRL(totalPago)}</p>
-          <p className="text-xs text-black/60 dark:text-white/60">pago</p>
-        </Card>
-        <Card className="text-center">
-          <p className="text-lg font-semibold">{formatBRL(totalReservado)}</p>
-          <p className="text-xs text-black/60 dark:text-white/60">reservado</p>
-        </Card>
-        <Card className="text-center">
-          <p
-            className={`text-lg font-semibold ${
-              saldo < 0 ? "text-red-600 dark:text-red-400" : ""
-            }`}
-          >
-            {formatBRL(saldo)}
-          </p>
-          <p className="text-xs text-black/60 dark:text-white/60">saldo</p>
-        </Card>
+      <section>
+        <h2 className="font-semibold mb-3">Gastos Totais da Viagem</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Card className="text-center">
+            <p className="text-lg font-semibold">{formatBRL(totalPlanned)}</p>
+            <p className="text-xs text-black/60 dark:text-white/60">planejado</p>
+          </Card>
+          <Card className="text-center">
+            <p className="text-lg font-semibold">{formatBRL(totalPago)}</p>
+            <p className="text-xs text-black/60 dark:text-white/60">pago</p>
+          </Card>
+          <Card className="text-center">
+            <p className="text-lg font-semibold">{formatBRL(totalReservado)}</p>
+            <p className="text-xs text-black/60 dark:text-white/60">reservado</p>
+          </Card>
+          <Card className="text-center">
+            <p
+              className={`text-lg font-semibold ${
+                saldo < 0 ? "text-red-600 dark:text-red-400" : ""
+              }`}
+            >
+              {formatBRL(saldo)}
+            </p>
+            <p className="text-xs text-black/60 dark:text-white/60">saldo</p>
+          </Card>
+        </div>
       </section>
 
       <section>
-        <h2 className="font-semibold mb-3">Por Pessoa</h2>
+        <h2 className="font-semibold mb-1">Gasto por Pessoa</h2>
+        <p className="text-xs text-black/60 dark:text-white/60 mb-3">
+          Cota justa de cada um, baseada em &quot;Despesa de&quot; — não em
+          quem pagou. Um gasto marcado como &quot;Ambos&quot; é dividido ao meio.
+        </p>
         <Card className="text-center mb-3">
           <p className="text-2xl font-semibold">{formatBRL(totalGasto)}</p>
           <p className="text-xs text-black/60 dark:text-white/60">
@@ -220,14 +260,44 @@ export default function OrcamentoPage() {
         )}
 
         <div className="grid sm:grid-cols-2 gap-3">
-          {perPerson.map(({ person, direct, share, total }) => (
+          {perPersonShare.map(({ person, direct, share, total }) => (
             <Card key={person}>
               <p className="font-medium mb-1">{person}</p>
               <p className="text-xl font-semibold">{formatBRL(total)}</p>
               <p className="text-xs text-black/60 dark:text-white/60 mt-1">
-                {formatBRL(direct)} pago direto
-                {sharedTotal > 0 &&
+                {formatBRL(direct)} de despesas individuais
+                {sharedSplitTotal > 0 &&
                   ` + ${formatBRL(share)} (metade das despesas de "Ambos")`}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="font-semibold mb-1">Acerto de Contas</h2>
+        <p className="text-xs text-black/60 dark:text-white/60 mb-3">
+          Compara quanto cada um desembolsou de fato (&quot;Pago por&quot;)
+          com sua cota justa acima — a diferença é quem deve pra quem.
+        </p>
+        <Card className="text-center mb-3">
+          {settleAmount < 0.01 ? (
+            <p className="text-lg font-semibold">Contas equilibradas 🎉</p>
+          ) : (
+            <p className="text-lg font-semibold">
+              {settleDebtor} deve {formatBRL(settleAmount)} para {settleCreditor}
+            </p>
+          )}
+        </Card>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {settleUp.map(({ person, paidTotal, fairShare }) => (
+            <Card key={person}>
+              <p className="font-medium mb-1">{person}</p>
+              <p className="text-xs text-black/60 dark:text-white/60">
+                Pagou de fato: {formatBRL(paidTotal)}
+              </p>
+              <p className="text-xs text-black/60 dark:text-white/60">
+                Cota justa: {formatBRL(fairShare)}
               </p>
             </Card>
           ))}
@@ -289,7 +359,9 @@ export default function OrcamentoPage() {
                             {" · "}
                             {formatBRL(exp.amountBRL)}
                             {" · "}
-                            {exp.paidBy}
+                            pago por {exp.paidBy}
+                            {" · "}
+                            despesa de {effectiveSplit(exp)}
                             {" · "}
                             {exp.status === "pago" ? "pago" : "reservado"}
                             {" · "}
@@ -348,7 +420,9 @@ export default function OrcamentoPage() {
                           {currencySymbols[exp.currency]} {exp.amount.toLocaleString("pt-BR")}
                           {exp.currency !== "BRL" && ` (${formatBRL(exp.amountBRL)})`}
                           {" · "}
-                          {exp.paidBy}
+                          pago por {exp.paidBy}
+                          {" · "}
+                          despesa de {effectiveSplit(exp)}
                           {" · "}
                           {exp.status === "pago" ? "pago" : "reservado"}
                           {" · "}
@@ -440,17 +514,34 @@ export default function OrcamentoPage() {
               onChange={(e) => setDate(e.target.value)}
               className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
             />
-            <select
-              value={paidBy}
-              onChange={(e) => setPaidBy(e.target.value as Owner)}
-              className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
-            >
-              {owners.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
-              ))}
-            </select>
+            <label className="text-xs text-black/60 dark:text-white/60 flex flex-col gap-1">
+              Pago por
+              <select
+                value={paidBy}
+                onChange={(e) => setPaidBy(e.target.value as Owner)}
+                className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
+              >
+                {owners.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs text-black/60 dark:text-white/60 flex flex-col gap-1">
+              Despesa de
+              <select
+                value={splitBetween}
+                onChange={(e) => setSplitBetween(e.target.value as Owner)}
+                className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
+              >
+                {owners.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+            </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as ExpenseStatus)}
