@@ -47,16 +47,40 @@ export default function OrcamentoPage() {
   const [date, setDate] = useState("");
   const [paidBy, setPaidBy] = useState<Owner>("Ambos");
   const [status, setStatus] = useState<ExpenseStatus>("planejado");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  function addExpense(e: FormEvent) {
+  function resetForm() {
+    setDescription("");
+    setCategoryId(seedCategories[0]?.id ?? "");
+    setAmount("");
+    setCurrency("BRL");
+    setAmountBRL("");
+    setDate("");
+    setPaidBy("Ambos");
+    setStatus("planejado");
+    setEditingId(null);
+  }
+
+  function startEdit(exp: Expense) {
+    setEditingId(exp.id);
+    setDescription(exp.description);
+    setCategoryId(exp.categoryId);
+    setAmount(exp.amount.toString());
+    setCurrency(exp.currency);
+    setAmountBRL(exp.amountBRL.toString());
+    setDate(exp.date ?? "");
+    setPaidBy(exp.paidBy);
+    setStatus(exp.status);
+  }
+
+  function submitExpense(e: FormEvent) {
     e.preventDefault();
     const amountNum = parseFloat(amount);
     const amountBRLNum = currency === "BRL" ? amountNum : parseFloat(amountBRL);
     if (!description.trim() || Number.isNaN(amountNum) || Number.isNaN(amountBRLNum)) {
       return;
     }
-    const newExpense: Expense = {
-      id: crypto.randomUUID(),
+    const payload = {
       categoryId,
       description: description.trim(),
       amount: amountNum,
@@ -66,15 +90,19 @@ export default function OrcamentoPage() {
       paidBy,
       status,
     };
-    setItems((prev) => [...prev, newExpense]);
-    setDescription("");
-    setAmount("");
-    setAmountBRL("");
-    setDate("");
+    if (editingId) {
+      setItems((prev) =>
+        prev.map((i) => (i.id === editingId ? { ...i, ...payload } : i))
+      );
+    } else {
+      setItems((prev) => [...prev, { id: crypto.randomUUID(), ...payload }]);
+    }
+    resetForm();
   }
 
   function removeExpense(id: string) {
     setItems((prev) => prev.filter((i) => i.id !== id));
+    if (editingId === id) resetForm();
   }
 
   function updatePlanned(id: string, value: string) {
@@ -248,13 +276,18 @@ export default function OrcamentoPage() {
                             {exp.status === "pago" ? "pago" : "reservado"}
                           </span>
                         </div>
-                        <button
-                          onClick={() => removeExpense(exp.id)}
-                          aria-label="Remover despesa"
-                          className="text-black/40 hover:text-red-600 dark:text-white/40 dark:hover:text-red-400"
-                        >
-                          ✕
-                        </button>
+                        <div className="flex items-center gap-2 text-xs shrink-0">
+                          <button onClick={() => startEdit(exp)} className="underline">
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => removeExpense(exp.id)}
+                            aria-label="Remover despesa"
+                            className="text-black/40 hover:text-red-600 dark:text-white/40 dark:hover:text-red-400"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -300,13 +333,18 @@ export default function OrcamentoPage() {
                           {exp.status === "pago" ? "pago" : "reservado"}
                         </span>
                       </div>
-                      <button
-                        onClick={() => removeExpense(exp.id)}
-                        aria-label="Remover despesa"
-                        className="text-black/40 hover:text-red-600 dark:text-white/40 dark:hover:text-red-400 shrink-0"
-                      >
-                        ✕
-                      </button>
+                      <div className="flex items-center gap-3 text-xs shrink-0">
+                        <button onClick={() => startEdit(exp)} className="underline">
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => removeExpense(exp.id)}
+                          aria-label="Remover despesa"
+                          className="text-black/40 hover:text-red-600 dark:text-white/40 dark:hover:text-red-400"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </li>
                   );
                 })}
@@ -316,10 +354,12 @@ export default function OrcamentoPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold mb-3">Adicionar despesa</h2>
+        <h2 className="font-semibold mb-3">
+          {editingId ? "Editar despesa" : "Adicionar despesa"}
+        </h2>
         <Card>
           <form
-            onSubmit={addExpense}
+            onSubmit={submitExpense}
             className="grid grid-cols-2 sm:grid-cols-4 gap-3"
           >
             <input
@@ -397,12 +437,23 @@ export default function OrcamentoPage() {
               <option value="planejado">Reservado / planejado</option>
               <option value="pago">Pago</option>
             </select>
-            <button
-              type="submit"
-              className="col-span-2 sm:col-span-4 rounded-full bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90"
-            >
-              Adicionar
-            </button>
+            <div className="col-span-2 sm:col-span-4 flex gap-2">
+              <button
+                type="submit"
+                className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90"
+              >
+                {editingId ? "Salvar alterações" : "Adicionar"}
+              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="rounded-full border border-black/10 dark:border-white/10 px-4 py-2 text-sm"
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
           </form>
         </Card>
       </section>
