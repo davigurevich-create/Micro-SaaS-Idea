@@ -84,6 +84,7 @@ export interface BudgetCategory {
 }
 
 export type ExpenseStatus = "planejado" | "pago";
+export type PaymentType = "avista" | "parcelado";
 
 export interface Expense {
   id: string;
@@ -95,5 +96,7 @@ export interface Expense {
   date: string | null;
   paidBy: Owner;
   status: ExpenseStatus;
+  paymentType: PaymentType;
+  installments?: number; // número de parcelas, só relevante se paymentType === "parcelado"
   notes?: string;
 }

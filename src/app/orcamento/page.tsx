@@ -14,6 +14,7 @@ import {
   Expense,
   ExpenseStatus,
   Owner,
+  PaymentType,
 } from "@/lib/types";
 
 const currencies: Currency[] = ["BRL", "ARS", "CLP", "USD"];
@@ -27,6 +28,13 @@ const owners: Owner[] = ["Davi", "Nitzi", "Ambos"];
 
 function formatBRL(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function paymentLabel(exp: Expense) {
+  if (exp.paymentType === "parcelado" && exp.installments && exp.installments > 1) {
+    return `${exp.installments}x de ${formatBRL(exp.amountBRL / exp.installments)}`;
+  }
+  return "à vista";
 }
 
 export default function OrcamentoPage() {
@@ -47,6 +55,8 @@ export default function OrcamentoPage() {
   const [date, setDate] = useState("");
   const [paidBy, setPaidBy] = useState<Owner>("Ambos");
   const [status, setStatus] = useState<ExpenseStatus>("planejado");
+  const [paymentType, setPaymentType] = useState<PaymentType>("avista");
+  const [installments, setInstallments] = useState("2");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   function resetForm() {
@@ -58,6 +68,8 @@ export default function OrcamentoPage() {
     setDate("");
     setPaidBy("Ambos");
     setStatus("planejado");
+    setPaymentType("avista");
+    setInstallments("2");
     setEditingId(null);
   }
 
@@ -71,6 +83,8 @@ export default function OrcamentoPage() {
     setDate(exp.date ?? "");
     setPaidBy(exp.paidBy);
     setStatus(exp.status);
+    setPaymentType(exp.paymentType);
+    setInstallments(exp.installments ? exp.installments.toString() : "2");
   }
 
   function submitExpense(e: FormEvent) {
@@ -80,6 +94,7 @@ export default function OrcamentoPage() {
     if (!description.trim() || Number.isNaN(amountNum) || Number.isNaN(amountBRLNum)) {
       return;
     }
+    const installmentsNum = parseInt(installments, 10);
     const payload = {
       categoryId,
       description: description.trim(),
@@ -89,6 +104,9 @@ export default function OrcamentoPage() {
       date: date || null,
       paidBy,
       status,
+      paymentType,
+      installments:
+        paymentType === "parcelado" && installmentsNum > 1 ? installmentsNum : undefined,
     };
     if (editingId) {
       setItems((prev) =>
@@ -274,6 +292,8 @@ export default function OrcamentoPage() {
                             {exp.paidBy}
                             {" · "}
                             {exp.status === "pago" ? "pago" : "reservado"}
+                            {" · "}
+                            {paymentLabel(exp)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-xs shrink-0">
@@ -331,6 +351,8 @@ export default function OrcamentoPage() {
                           {exp.paidBy}
                           {" · "}
                           {exp.status === "pago" ? "pago" : "reservado"}
+                          {" · "}
+                          {paymentLabel(exp)}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 text-xs shrink-0">
@@ -437,6 +459,26 @@ export default function OrcamentoPage() {
               <option value="planejado">Reservado / planejado</option>
               <option value="pago">Pago</option>
             </select>
+            <select
+              value={paymentType}
+              onChange={(e) => setPaymentType(e.target.value as PaymentType)}
+              className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
+            >
+              <option value="avista">À vista</option>
+              <option value="parcelado">Parcelado</option>
+            </select>
+            {paymentType === "parcelado" && (
+              <input
+                type="number"
+                min={2}
+                step="1"
+                placeholder="Número de parcelas"
+                value={installments}
+                onChange={(e) => setInstallments(e.target.value)}
+                className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
+                required
+              />
+            )}
             <div className="col-span-2 sm:col-span-4 flex gap-2">
               <button
                 type="submit"
