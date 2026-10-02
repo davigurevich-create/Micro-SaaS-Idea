@@ -51,7 +51,7 @@ export default function OrcamentoPage() {
   function addExpense(e: FormEvent) {
     e.preventDefault();
     const amountNum = parseFloat(amount);
-    const amountBRLNum = parseFloat(amountBRL);
+    const amountBRLNum = currency === "BRL" ? amountNum : parseFloat(amountBRL);
     if (!description.trim() || Number.isNaN(amountNum) || Number.isNaN(amountBRLNum)) {
       return;
     }
@@ -266,6 +266,56 @@ export default function OrcamentoPage() {
       </section>
 
       <section>
+        <h2 className="font-semibold mb-3">
+          Todas as despesas {items.length > 0 && `(${items.length})`}
+        </h2>
+        {items.length === 0 ? (
+          <Card>
+            <p className="text-black/60 dark:text-white/60">
+              Nenhuma despesa registrada ainda. Adicione a primeira no formulário abaixo.
+            </p>
+          </Card>
+        ) : (
+          <Card>
+            <ul className="flex flex-col gap-2">
+              {[...items]
+                .reverse()
+                .map((exp) => {
+                  const cat = categories.find((c) => c.id === exp.categoryId);
+                  return (
+                    <li
+                      key={exp.id}
+                      className="flex items-center justify-between gap-2 text-sm border-b border-black/5 dark:border-white/10 pb-2 last:border-0 last:pb-0"
+                    >
+                      <div>
+                        <span className="font-medium">{exp.description}</span>
+                        <span className="text-black/50 dark:text-white/50 ml-2">
+                          {cat?.name ?? "Sem categoria"}
+                          {" · "}
+                          {currencySymbols[exp.currency]} {exp.amount.toLocaleString("pt-BR")}
+                          {exp.currency !== "BRL" && ` (${formatBRL(exp.amountBRL)})`}
+                          {" · "}
+                          {exp.paidBy}
+                          {" · "}
+                          {exp.status === "pago" ? "pago" : "reservado"}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => removeExpense(exp.id)}
+                        aria-label="Remover despesa"
+                        className="text-black/40 hover:text-red-600 dark:text-white/40 dark:hover:text-red-400 shrink-0"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  );
+                })}
+            </ul>
+          </Card>
+        )}
+      </section>
+
+      <section>
         <h2 className="font-semibold mb-3">Adicionar despesa</h2>
         <Card>
           <form
@@ -311,15 +361,17 @@ export default function OrcamentoPage() {
               className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
               required
             />
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Equivalente em R$"
-              value={amountBRL}
-              onChange={(e) => setAmountBRL(e.target.value)}
-              className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
-              required
-            />
+            {currency !== "BRL" && (
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Equivalente em R$"
+                value={amountBRL}
+                onChange={(e) => setAmountBRL(e.target.value)}
+                className="rounded border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 text-sm"
+                required
+              />
+            )}
             <input
               type="date"
               value={date}
