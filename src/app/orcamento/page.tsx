@@ -94,6 +94,25 @@ export default function OrcamentoPage() {
     .filter((i) => i.status === "planejado")
     .reduce((sum, i) => sum + i.amountBRL, 0);
   const saldo = totalPlanned - totalPago - totalReservado;
+  const totalGasto = totalPago + totalReservado;
+
+  const people = owners.filter((o): o is Exclude<Owner, "Ambos"> => o !== "Ambos");
+  const sharedTotal = items
+    .filter((i) => i.paidBy === "Ambos")
+    .reduce((sum, i) => sum + i.amountBRL, 0);
+  const perPerson = people.map((person) => {
+    const direct = items
+      .filter((i) => i.paidBy === person)
+      .reduce((sum, i) => sum + i.amountBRL, 0);
+    const share = sharedTotal / 2;
+    return { person, direct, share, total: direct + share };
+  });
+  const davi = perPerson[0];
+  const nitzi = perPerson[1];
+  const splitPct =
+    davi && nitzi && davi.total + nitzi.total > 0
+      ? (davi.total / (davi.total + nitzi.total)) * 100
+      : 50;
 
   return (
     <div className="flex flex-col gap-6">
@@ -130,6 +149,43 @@ export default function OrcamentoPage() {
           </p>
           <p className="text-xs text-black/60 dark:text-white/60">saldo</p>
         </Card>
+      </section>
+
+      <section>
+        <h2 className="font-semibold mb-3">Por Pessoa</h2>
+        <Card className="text-center mb-3">
+          <p className="text-2xl font-semibold">{formatBRL(totalGasto)}</p>
+          <p className="text-xs text-black/60 dark:text-white/60">
+            gasto total da viagem (pago + reservado)
+          </p>
+        </Card>
+
+        {davi && nitzi && (
+          <div className="h-2 rounded-full overflow-hidden flex mb-3">
+            <div
+              className="h-full bg-foreground"
+              style={{ width: `${splitPct}%` }}
+            />
+            <div
+              className="h-full bg-orange-400"
+              style={{ width: `${100 - splitPct}%` }}
+            />
+          </div>
+        )}
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          {perPerson.map(({ person, direct, share, total }) => (
+            <Card key={person}>
+              <p className="font-medium mb-1">{person}</p>
+              <p className="text-xl font-semibold">{formatBRL(total)}</p>
+              <p className="text-xs text-black/60 dark:text-white/60 mt-1">
+                {formatBRL(direct)} pago direto
+                {sharedTotal > 0 &&
+                  ` + ${formatBRL(share)} (metade das despesas de "Ambos")`}
+              </p>
+            </Card>
+          ))}
+        </div>
       </section>
 
       <section>
