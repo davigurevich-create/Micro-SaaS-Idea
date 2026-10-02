@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -16,6 +17,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    color-scheme: dark;
   }
 }
 
@@ -23,4 +25,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* O popup nativo do <select> tem fundo claro na maioria dos navegadores,
+   independente do tema da página — então as opções sempre usam texto
+   escuro aqui, em vez de herdar a cor clara do modo escuro (que ficava
+   ilegível: texto claro sobre fundo claro). */
+select option {
+  color: #171717;
+  background-color: #ffffff;
 }
