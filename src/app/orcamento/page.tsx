@@ -6,7 +6,7 @@ import {
   budgetCategories as seedCategories,
   expenses as seedExpenses,
 } from "@/data/budget";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import {
   BudgetCategory,
@@ -44,11 +44,11 @@ function effectiveSplit(exp: Expense): Owner {
 }
 
 export default function OrcamentoPage() {
-  const [categories, setCategories] = useLocalStorageState<BudgetCategory[]>(
+  const [categories, setCategories] = useSharedState<BudgetCategory[]>(
     `${STORAGE_KEYS.budget}.categories`,
     seedCategories
   );
-  const [items, setItems] = useLocalStorageState<Expense[]>(
+  const [items, setItems] = useSharedState<Expense[]>(
     `${STORAGE_KEYS.budget}.items`,
     seedExpenses
   );

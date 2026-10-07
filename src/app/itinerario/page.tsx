@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { Card } from "@/components/Card";
 import { itinerary as seedItinerary } from "@/data/itinerary";
 import { activities as seedActivities } from "@/data/activities";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { Activity, ItineraryDay } from "@/lib/types";
 
@@ -17,11 +17,11 @@ const emptyForm = {
 };
 
 export default function ItinerarioPage() {
-  const [days, setDays] = useLocalStorageState<ItineraryDay[]>(
+  const [days, setDays] = useSharedState<ItineraryDay[]>(
     STORAGE_KEYS.itinerary,
     seedItinerary
   );
-  const [activityList] = useLocalStorageState<Activity[]>(
+  const [activityList] = useSharedState<Activity[]>(
     STORAGE_KEYS.activities,
     seedActivities
   );

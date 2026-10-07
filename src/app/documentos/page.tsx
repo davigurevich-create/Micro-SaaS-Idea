@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Card } from "@/components/Card";
 import { documents as seedDocuments } from "@/data/documents";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { DocumentType, Owner, TripDocument } from "@/lib/types";
 
@@ -25,7 +25,7 @@ const emptyForm = {
 };
 
 export default function DocumentosPage() {
-  const [documents, setDocuments] = useLocalStorageState<TripDocument[]>(
+  const [documents, setDocuments] = useSharedState<TripDocument[]>(
     STORAGE_KEYS.documents,
     seedDocuments
   );

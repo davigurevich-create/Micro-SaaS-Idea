@@ -3,14 +3,14 @@
 import { FormEvent, useState } from "react";
 import { Card } from "@/components/Card";
 import { packingList as seedPackingList } from "@/data/packing";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { Owner, PackingItem } from "@/lib/types";
 
 const owners: Owner[] = ["Davi", "Nitzi", "Ambos"];
 
 export default function MalaPage() {
-  const [items, setItems] = useLocalStorageState<PackingItem[]>(
+  const [items, setItems] = useSharedState<PackingItem[]>(
     STORAGE_KEYS.packing,
     seedPackingList
   );

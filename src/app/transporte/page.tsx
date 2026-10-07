@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Card } from "@/components/Card";
 import { transportLegs as seedTransportLegs } from "@/data/transport";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { TransportLeg, TransportType } from "@/lib/types";
 
@@ -29,7 +29,7 @@ const emptyForm = {
 };
 
 export default function TransportePage() {
-  const [legs, setLegs] = useLocalStorageState<TransportLeg[]>(
+  const [legs, setLegs] = useSharedState<TransportLeg[]>(
     STORAGE_KEYS.transport,
     seedTransportLegs
   );

@@ -18,7 +18,7 @@ import { itinerary as seedItinerary } from "@/data/itinerary";
 import { activities as seedActivities } from "@/data/activities";
 import { packingList as seedPackingList } from "@/data/packing";
 import { budgetCategories as seedCategories } from "@/data/budget";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import {
   Activity,
@@ -43,23 +43,23 @@ const sections = [
 ];
 
 export default function Home() {
-  const [trip, setTrip] = useLocalStorageState<TripInfo>(
+  const [trip, setTrip] = useSharedState<TripInfo>(
     STORAGE_KEYS.trip,
     seedTrip
   );
-  const [itinerary] = useLocalStorageState<ItineraryDay[]>(
+  const [itinerary] = useSharedState<ItineraryDay[]>(
     STORAGE_KEYS.itinerary,
     seedItinerary
   );
-  const [activities] = useLocalStorageState<Activity[]>(
+  const [activities] = useSharedState<Activity[]>(
     STORAGE_KEYS.activities,
     seedActivities
   );
-  const [packingList] = useLocalStorageState<PackingItem[]>(
+  const [packingList] = useSharedState<PackingItem[]>(
     STORAGE_KEYS.packing,
     seedPackingList
   );
-  const [budgetCategories] = useLocalStorageState<BudgetCategory[]>(
+  const [budgetCategories] = useSharedState<BudgetCategory[]>(
     `${STORAGE_KEYS.budget}.categories`,
     seedCategories
   );

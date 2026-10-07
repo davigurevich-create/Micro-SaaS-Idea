@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { Card } from "@/components/Card";
 import { activities as seedActivities } from "@/data/activities";
-import { useLocalStorageState } from "@/lib/useLocalStorageState";
+import { useSharedState } from "@/lib/useSharedState";
 import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { Activity, ActivityCategory, Priority } from "@/lib/types";
 
@@ -27,7 +27,7 @@ const emptyForm = {
 };
 
 export default function PasseiosPage() {
-  const [activities, setActivities] = useLocalStorageState<Activity[]>(
+  const [activities, setActivities] = useSharedState<Activity[]>(
     STORAGE_KEYS.activities,
     seedActivities
   );
