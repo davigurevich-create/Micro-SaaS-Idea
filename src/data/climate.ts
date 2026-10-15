@@ -1,63 +1,64 @@
 import { ClimateInfo } from "@/lib/types";
 
-// Médias históricas aproximadas (referência geral, não previsão).
-// Servem para ajudar a decidir época da viagem e o que levar na mala.
+// Médias históricas aproximadas pro período exato da viagem (25/03 a
+// 04/04/2027) — referência pra decidir o que levar na mala, não previsão
+// real (2027 ainda está longe demais pra isso). Só os locais do roteiro.
 // Quando estivermos perto da data real, trocamos por previsão via API.
 export const climateHistory: ClimateInfo[] = [
   {
     region: "El Calafate (AR)",
-    month: "Dezembro",
-    avgHigh: "19°C",
+    month: "Final de março (25–31)",
+    avgHigh: "13°C",
     avgLow: "6°C",
-    notes: "Dias longos, vento forte à tarde. Alta temporada.",
+    notes: "Ainda clima de verão tardio, mas esfriando. Vento forte à tarde.",
   },
   {
     region: "El Calafate (AR)",
-    month: "Janeiro",
-    avgHigh: "21°C",
-    avgLow: "8°C",
-    notes: "Mês mais quente. Vento constante o dia todo.",
+    month: "Início de abril (1–4)",
+    avgHigh: "9°C",
+    avgLow: "3°C",
+    notes: "Outono já estabelecido, dias mais curtos e mais frios que março.",
   },
   {
     region: "El Chaltén (AR)",
-    month: "Dezembro",
-    avgHigh: "17°C",
-    avgLow: "5°C",
-    notes: "Clima instável, trilhas podem fechar por vento forte.",
+    month: "Final de março (25–31)",
+    avgHigh: "6°C",
+    avgLow: "2°C",
+    notes: "Frio e instável mesmo de dia, chance real de chuva. Trilhas podem fechar por vento.",
   },
   {
     region: "El Chaltén (AR)",
-    month: "Fevereiro",
-    avgHigh: "18°C",
-    avgLow: "5°C",
-    notes: "Boa visibilidade do Fitz Roy, mas sempre variável.",
+    month: "Início de abril (1–4)",
+    avgHigh: "5°C",
+    avgLow: "1°C",
+    notes: "Chance de neve nas partes mais altas das trilhas. Levar roupa bem quente.",
   },
   {
-    region: "Ushuaia (AR)",
-    month: "Dezembro",
-    avgHigh: "13°C",
-    avgLow: "5°C",
-    notes: "Clima frio mesmo no verão, chuva/vento frequentes.",
-  },
-  {
-    region: "Ushuaia (AR)",
-    month: "Janeiro",
+    region: "Puerto Natales (CL)",
+    month: "Final de março (25–31)",
     avgHigh: "14°C",
     avgLow: "6°C",
-    notes: "Mês mais quente, ainda assim leve casaco corta-vento.",
+    notes: "Chuva frequente, cerca de 6h de sol por dia.",
   },
   {
-    region: "Puerto Natales / Torres del Paine (CL)",
-    month: "Janeiro",
-    avgHigh: "17°C",
+    region: "Puerto Natales (CL)",
+    month: "Início de abril (1–4)",
+    avgHigh: "11°C",
+    avgLow: "5°C",
+    notes: "Mais frio que março, vento constante — vale pra Torres del Paine também.",
+  },
+  {
+    region: "Punta Arenas (CL)",
+    month: "Final de março (25–31)",
+    avgHigh: "12°C",
     avgLow: "7°C",
-    notes: "Pico de alta temporada no parque, reservar refúgios com antecedência.",
+    notes: "Nublado na maior parte dos dias, bastante vento.",
   },
   {
-    region: "Bariloche (AR)",
-    month: "Fevereiro",
-    avgHigh: "22°C",
-    avgLow: "8°C",
-    notes: "Bom para trekking, lagos e cervejarias artesanais.",
+    region: "Punta Arenas (CL)",
+    month: "Início de abril (1–4)",
+    avgHigh: "9°C",
+    avgLow: "5°C",
+    notes: "Mais chuva e umidade que março, temperatura caindo rápido.",
   },
 ];
