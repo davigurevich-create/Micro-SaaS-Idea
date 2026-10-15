@@ -2,6 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import { DivIcon } from "leaflet";
+import { LatLngBounds } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import { lookupCoords } from "@/data/locationCoords";
 import { ItineraryDay } from "@/lib/types";
@@ -28,33 +29,45 @@ function numberedIcon(n: number) {
   });
 }
 
-// Agrupa dias consecutivos no mesmo local em uma única parada (com a
-// contagem de noites), na ordem em que aparecem no itinerário real.
-function stopsFromItinerary(days: ItineraryDay[]): RouteStop[] {
+// Um marcador por cidade (mesmo quando ela é visitada mais de uma vez em
+// momentos não seguidos, como voo de entrada/saída por Punta Arenas ou uma
+// volta a Puerto Natales) — somando as noites de todas as passagens e
+// numerando pela ordem da primeira visita. A linha da rota, separada, segue
+// o trajeto real dia a dia, incluindo idas e vindas.
+function stopsFromItinerary(days: ItineraryDay[]): {
+  stops: RouteStop[];
+  routePath: [number, number][];
+} {
   const stops: RouteStop[] = [];
+  const byName = new Map<string, RouteStop>();
+  const routePath: [number, number][] = [];
 
   for (const day of days) {
-    const last = stops[stops.length - 1];
-    if (last && last.name === day.location) {
-      last.nights += 1;
-      continue;
-    }
     const coords = lookupCoords(day.location);
     if (!coords) continue;
-    stops.push({
+
+    routePath.push(coords);
+
+    const existing = byName.get(day.location);
+    if (existing) {
+      existing.nights += 1;
+      continue;
+    }
+    const stop: RouteStop = {
       order: stops.length + 1,
       name: day.location,
       nights: 1,
       coords,
-    });
+    };
+    stops.push(stop);
+    byName.set(day.location, stop);
   }
 
-  // re-numera ignorando paradas sem coordenadas conhecidas
-  return stops.map((s, i) => ({ ...s, order: i + 1 }));
+  return { stops, routePath };
 }
 
 export default function RouteMap({ itinerary }: { itinerary: ItineraryDay[] }) {
-  const stops = stopsFromItinerary(itinerary);
+  const { stops, routePath } = stopsFromItinerary(itinerary);
 
   if (stops.length === 0) {
     return (
@@ -66,13 +79,12 @@ export default function RouteMap({ itinerary }: { itinerary: ItineraryDay[] }) {
     );
   }
 
-  const loopPath = stops.map((s) => s.coords);
-  const center = stops[Math.floor(stops.length / 2)].coords;
+  const bounds = new LatLngBounds(stops.map((s) => s.coords));
 
   return (
     <MapContainer
-      center={center}
-      zoom={7}
+      bounds={bounds}
+      boundsOptions={{ padding: [32, 32] }}
       scrollWheelZoom={false}
       className="h-80 sm:h-[420px] w-full rounded-2xl"
     >
@@ -80,8 +92,8 @@ export default function RouteMap({ itinerary }: { itinerary: ItineraryDay[] }) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {loopPath.length > 1 && (
-        <Polyline positions={loopPath} pathOptions={{ color: "#171717", weight: 3 }} />
+      {routePath.length > 1 && (
+        <Polyline positions={routePath} pathOptions={{ color: "#171717", weight: 3 }} />
       )}
       {stops.map((stop) => (
         <Marker key={`${stop.order}-${stop.name}`} position={stop.coords} icon={numberedIcon(stop.order)}>
