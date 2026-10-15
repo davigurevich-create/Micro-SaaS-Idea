@@ -47,7 +47,7 @@ export default function Home() {
     STORAGE_KEYS.trip,
     seedTrip
   );
-  const [itinerary] = useSharedState<ItineraryDay[]>(
+  const [itinerary, , itineraryLoaded] = useSharedState<ItineraryDay[]>(
     STORAGE_KEYS.itinerary,
     seedItinerary
   );
@@ -229,11 +229,15 @@ export default function Home() {
       <section>
         <h2 className="font-semibold mb-3">Mapa do Roteiro</h2>
         <div className="rounded-2xl border border-black/10 dark:border-white/10 overflow-hidden">
-          <RouteMap />
+          {itineraryLoaded ? (
+            <RouteMap itinerary={itinerary} />
+          ) : (
+            <div className="h-80 sm:h-[420px] w-full bg-black/5 dark:bg-white/10 animate-pulse" />
+          )}
         </div>
         <p className="text-xs text-black/50 dark:text-white/50 mt-2">
-          Linha sólida: percurso de carro. Linha laranja pontilhada: day trips
-          a Torres del Paine a partir de Puerto Natales.
+          Paradas numeradas na ordem dos dias cadastrados em Itinerário.
+          Edite lá e o mapa atualiza automaticamente.
         </p>
       </section>
 
